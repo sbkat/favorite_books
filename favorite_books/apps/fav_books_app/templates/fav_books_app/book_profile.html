@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <title>Favorite Books</title>
+</head>
+
+<header>
+    <h1 class="lead" style="display: inline-block; vertical-align:top; font-weight:400;">Welcome, {{ this_user.first_name }}!</h1>
+    <a href="/logout" style="margin-left: 70vw; text-decoration: none; color:black; display: inline-block; vertical-align: top;">Log Out</a>
+    <hr>
+</header>
+
+<body style="margin:20px;" class="lead">
+    <div style="width:45vw; display: inline-block; vertical-align: top;">
+        {% if this_book.uploaded_by.email == this_user.email %}
+            <form action="/books/{{this_book.id}}/update_book" method="POST">
+                {% csrf_token %}
+                <input class="form-control" type="text" name="edit_title" value="{{this_book.title}}">
+                <p>Added by: {{this_book.uploaded_by.first_name }} {{ this_book.uploaded_by.last_name }}</p>
+                <p>Added on: {{this_book.created_at}}</p>
+                <p>Last updated on: {{this_book.updated_at}}</p>
+                <p>Description:</p>
+                <textarea class="form-control" rows="5" name="edit_description">{{this_book.description}}</textarea><br>
+                <button type="submit" class="btn btn-info">Update Book</button>
+                <a href="/books/{{this_book.id}}/delete" class="btn btn-danger" style="text-decoration: none;">Delete</a>
+            </form>
+        {% else %}
+            <h1 style="font-weight:400;" class="lead">{{ this_book.title }}</h1>
+            <p>Added by: {{this_book.uploaded_by.first_name }} {{ this_book.uploaded_by.last_name }}</p>
+            <p>Added on: {{this_book.created_at}}</p>
+            <p>Last updated on: {{this_book.updated_at}}</p>
+            <p>Description: {{this_book.description}}</p>
+        {% endif %}
+
+    </div>
+    <div style="width:45vw; display: inline-block; vertical-align: top; margin-left:10px;">
+        <h1 class="lead" style="font-weight:400;">Users Who Like This Book:</h1>
+        <ul>
+            {% for users in this_book.users_liked.all %}
+                <li>{{ users.first_name }} {{ users.last_name }}</li>
+                {% if this_user == users %}
+                    <a href="/books/{{this_book.id}}/unfavorite">Un-Favorite</a>
+                {% endif %}
+            {% endfor %}
+        </ul>
+            {% if not this_user in this_book.users_liked.all %}
+                <a href="/books/{{this_book.id}}/add_to_my_favs">Add to Favorites</a>
+            {% endif %}
+       
+    </div>
+    
+</body>
+
+</html>
